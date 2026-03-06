@@ -33,4 +33,24 @@ public class AdminController {
         productRepository.deleteById(id);
         return "redirect:/admin";
     }
+    @GetMapping("/admin/edit/{id}")
+    public String editProduct(@PathVariable Long id, Model model) {
+
+        Product product = productRepository.findById(id).orElseThrow();
+
+        model.addAttribute("product", product);
+
+        return "edit-product";
+    }
+
+    @PostMapping("/admin/update")
+    public String updateProduct(@ModelAttribute Product product) {
+
+        System.out.println("ID received: " + product.getId());
+
+
+        productRepository.save(product);
+
+        return "redirect:/admin";
+    }
 }

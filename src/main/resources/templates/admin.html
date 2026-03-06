@@ -16,8 +16,12 @@
   <p th:text="${product.price}"></p>
   <img th:src="${product.imageUrl}" width="200">
 
+  <a th:href="@{/admin/edit/{id}(id=${product.id})}">
+    <button type="button">Update</button>
+  </a>
+
   <form th:action="@{/admin/delete/{id}(id=${product.id})}" method="post">
-    <button type="submit">Delete</button>
+    <button type="submit" style="background-color:red; color:white;">Delete</button>
   </form>
 
 </div>
