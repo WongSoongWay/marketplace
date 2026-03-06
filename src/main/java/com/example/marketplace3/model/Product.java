@@ -8,7 +8,7 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private boolean visible = true;
 
     private String name;
     private double price;
@@ -22,6 +22,14 @@ public class Product {
         this.name = name;
         this.price = price;
         this.description = description;
+    }
+
+    public boolean isVisible(){
+        return visible;
+    }
+
+    public void setVisible(boolean visible){
+        this.visible = visible;
     }
 
     public Long getId() {

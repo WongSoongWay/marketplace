@@ -25,7 +25,7 @@ public class AdminController {
     @PostMapping("/admin/add-product")
     public String addProduct(@ModelAttribute Product product) {
         productRepository.save(product);
-        return "redirect:/";
+        return "redirect:/admin";
     }
 
     @PostMapping("/admin/delete/{id}")
@@ -48,6 +48,18 @@ public class AdminController {
 
         System.out.println("ID received: " + product.getId());
 
+
+        productRepository.save(product);
+
+        return "redirect:/admin";
+    }
+
+    @PostMapping("/admin/toggle-visibility/{id}")
+    public String toggleVisibility(@PathVariable Long id) {
+
+        Product product = productRepository.findById(id).orElseThrow();
+
+        product.setVisible(!product.isVisible());
 
         productRepository.save(product);
 

@@ -24,7 +24,17 @@
     <button type="submit" style="background-color:red; color:white;">Delete</button>
   </form>
 
+  <form th:action="@{/admin/toggle-visibility/{id}(id=${product.id})}"
+        method="post"
+        style="display:inline;">
+
+    <button type="submit">
+      <span th:text="${product.visible} ? 'Hide' : 'Show'"></span>
+    </button>
+
+  </form>
 </div>
+
 
 <form th:action="@{/admin/add-product}" th:object="${product}" method="post">
 
