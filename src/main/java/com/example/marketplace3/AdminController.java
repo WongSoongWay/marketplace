@@ -18,6 +18,7 @@ public class AdminController {
     @GetMapping("/admin")
     public String adminPage(Model model) {
         model.addAttribute("product", new Product());
+        model.addAttribute("products", productRepository.findAll());
         return "admin";
     }
 
@@ -25,5 +26,11 @@ public class AdminController {
     public String addProduct(@ModelAttribute Product product) {
         productRepository.save(product);
         return "redirect:/";
+    }
+
+    @PostMapping("/admin/delete/{id}")
+    public String deleteProduct(@PathVariable Long id) {
+        productRepository.deleteById(id);
+        return "redirect:/admin";
     }
 }

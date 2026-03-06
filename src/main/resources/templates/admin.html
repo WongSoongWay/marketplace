@@ -6,6 +6,21 @@
 <body>
 
 <h1>Admin Panel</h1>
+<a href="/">Home</a>
+
+
+<h2>Products</h2>
+
+<div th:each="product : ${products}">
+  <p th:text="${product.name}"></p>
+  <p th:text="${product.price}"></p>
+  <img th:src="${product.imageUrl}" width="200">
+
+  <form th:action="@{/admin/delete/{id}(id=${product.id})}" method="post">
+    <button type="submit">Delete</button>
+  </form>
+
+</div>
 
 <form th:action="@{/admin/add-product}" th:object="${product}" method="post">
 
