@@ -37,4 +37,25 @@ public class AuthController {
 
         return "redirect:/";
     }
+
+    @PostMapping("/login")
+    public String login(@RequestParam String username,
+                        @RequestParam String password,
+                        jakarta.servlet.http.HttpSession session) {
+
+        User user = userRepository.findByUsername(username);
+
+        if (user != null && user.getPassword().equals(password)) {
+
+            session.setAttribute("user", user);
+
+            if (user.getRole().equals("ADMIN")) {
+                return "redirect:/admin";
+            }
+
+            return "redirect:/";
+        }
+
+        return "redirect:/login?error";
+    }
 }

@@ -12,7 +12,9 @@ public class Product {
 
     private String name;
     private double price;
+    @Column(length = 1000)
     private String description;
+    @Column(length = 100000)
     private String imageUrl;
 
     public Product() {

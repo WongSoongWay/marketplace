@@ -2,20 +2,127 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Marketplace</title>
+    <style>
+
+        .product-grid{
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;              /* space between products */
+            padding: 40px;
+        }
+
+        .product-card{
+            border:1px solid #ccc;
+            padding:20px;
+            text-align:center;
+            border-radius:10px;
+
+            display:flex;
+            flex-direction:column;
+        }
+
+        .product-bottom{
+            margin-top:auto;
+        }
+
+        .product-name{
+            min-height:40px;
+        }
+
+        .product-card img{
+            width:100%;
+            max-width:200px;
+        }
+
+        /* quantity selector layout */
+        .quantity-selector{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            gap:10px;
+            margin-top:10px;
+        }
+
+        .quantity-selector button{
+            width:30px;
+            height:30px;
+            font-size:18px;
+        }
+
+        .quantity-selector input{
+            width:50px;
+            text-align:center;
+        }
+
+        /* add to cart button */
+        .add-cart{
+            margin-top:10px;
+            padding:8px 16px;
+        }
+
+        /* Remove arrows from number input */
+        /* Chrome, Safari, Edge */
+        .quantity-selector input::-webkit-outer-spin-button,
+        .quantity-selector input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        /* Firefox */
+        .quantity-selector input {
+            -moz-appearance: textfield;
+        }
+
+    </style>
 </head>
 <body>
 
-<a href="/admin">Admin Panel</a>
 <a href="/login">Login</a>
 
 <h1>Products</h1>
 
-<div th:each="product : ${products}">
+<div class="product-grid">
 
-    <img th:src="${product.imageUrl}" width="200">
-    <h2 th:text="${product.name}"></h2>
-    <p th:text="${product.price}"></p>
+    <div class="product-card" th:each="product : ${products}">
+
+        <p class="product-name" th:text="${product.name}"></p>
+
+        <img th:src="${product.imageUrl}">
+
+        <div class="product-bottom">
+
+            <p th:text="${product.price}"></p>
+
+            <div class="quantity-selector">
+                <button type="button">-</button>
+                <input type="number" value="1" min="1">
+                <button type="button">+</button>
+            </div>
+
+            <button class="add-cart">Add to Cart</button>
+
+        </div>
+
+    </div>
+
 </div>
+
+<script>
+    document.querySelectorAll(".quantity-selector").forEach(selector => {
+
+        const input = selector.querySelector("input");
+        const minus = selector.children[0];
+        const plus = selector.children[2];
+
+        minus.onclick = () => {
+            if(input.value > 1) input.value--;
+        };
+
+        plus.onclick = () => {
+            input.value++;
+        };
+
+    });
+</script>
 
 </body>
 </html>
