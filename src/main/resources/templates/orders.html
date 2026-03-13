@@ -1,0 +1,35 @@
+<a href="/admin">Admin</a>
+<h1>Orders</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Order ID</th>
+        <th>Product</th>
+        <th>User ID</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Status</th>
+        <th>Update Status</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="order : ${orders}">
+        <td th:text="${order.orderId}"></td>
+        <td th:text="${order.productId}"></td>
+        <td th:text="${order.userId}"></td>
+        <td th:text="${order.quantity}"></td>
+        <td th:text="${order.price}"></td>
+        <td th:text="${order.status}"></td>
+        <td>
+            <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post">
+                <select name="status">
+                    <option value="Confirmed" th:selected="${order.status == 'Confirmed'}">Confirmed</option>
+                    <option value="Shipped" th:selected="${order.status == 'Shipped'}">Shipped</option>
+                    <option value="Completed" th:selected="${order.status == 'Completed'}">Completed</option>
+                </select>
+                <button type="submit">Update</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>

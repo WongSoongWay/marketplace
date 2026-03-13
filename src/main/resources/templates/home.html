@@ -78,6 +78,7 @@
 
 <a href="/login" th:if="${session.user == null}">Login</a>
 <a href="/cart" th:if="${session.user != null}">Cart</a>
+<a href="/order-history" th:if="${session.user != null}">History</a>
 <a href="/logout" th:if="${session.user != null}">Logout</a>
 <a href="/admin">Admin</a>
 

@@ -1,10 +1,8 @@
 package com.example.marketplace3;
 
-import com.example.marketplace3.model.CartItem;
-import com.example.marketplace3.model.CartItemView;
-import com.example.marketplace3.model.Product;
-import com.example.marketplace3.model.User;
+import com.example.marketplace3.model.*;
 import com.example.marketplace3.repository.CartItemRepository;
+import com.example.marketplace3.repository.OrderHistoryRepository;
 import com.example.marketplace3.repository.ProductRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -19,10 +17,12 @@ public class CartController {
 
     private final CartItemRepository cartRepo;
     private final ProductRepository productRepo;
+    private final OrderHistoryRepository orderHistoryRepo;
 
-    public CartController(CartItemRepository cartRepo, ProductRepository productRepo) {
+    public CartController(CartItemRepository cartRepo, ProductRepository productRepo, OrderHistoryRepository orderHistoryRepo) {
         this.cartRepo = cartRepo;
         this.productRepo = productRepo;
+        this.orderHistoryRepo = orderHistoryRepo;
     }
 
     @GetMapping
@@ -34,15 +34,20 @@ public class CartController {
         // Build view objects with product info
         List<CartItemView> cartItems = items.stream().map(item -> {
             Product product = productRepo.findById(item.getProductId()).orElseThrow();
-            return new CartItemView(item.getId(), product, item.getQuantity());
+            return new CartItemView(item.getId(), product, item.getQuantity(), product.isVisible());
         }).toList();
 
-        double total = cartItems.stream()
+        double totalPrice = cartItems.stream().filter(item -> item.isVisible())
                 .mapToDouble(i -> i.getProduct().getPrice() * i.getQuantity())
                 .sum();
 
+        int totalQuantity = cartItems.stream().filter(item -> item.isVisible())
+                .mapToInt(i -> i.getQuantity())
+                .sum();  // <--- compute total items
+
         model.addAttribute("cartItems", cartItems);
-        model.addAttribute("total", total);
+        model.addAttribute("total", totalPrice);
+        model.addAttribute("totalQuantity", totalQuantity); // <--- add to model
 
         return "cart";
     }
@@ -66,7 +71,7 @@ public class CartController {
 
         cartRepo.save(item);
 
-        return "redirect:/cart";
+        return "redirect:/";
     }
 
     // --- NEW: Update cart item ---
@@ -93,5 +98,41 @@ public class CartController {
 
         cartRepo.save(item);
         return "redirect:/cart";
+    }
+    @PostMapping("/checkout")
+    public String checkout(HttpSession session) {
+
+        User user = (User) session.getAttribute("user");
+
+        if(user == null) {
+            return "redirect:/login";
+        }
+
+        List<CartItem> cartItems = cartRepo.findByUserId(user.getId());
+
+        if(cartItems.isEmpty()) {
+            return "redirect:/cart";
+        }
+
+        Long orderId = System.currentTimeMillis();
+
+        for (CartItem item : cartItems) {
+
+            Product product = productRepo.findById(item.getProductId()).orElse(null);
+            if(product == null) continue;
+            OrderHistory order = new OrderHistory(
+                    orderId,
+                    user.getId(),
+                    item.getProductId(),
+                    item.getQuantity(),
+                    product.getPrice()
+            );
+
+            orderHistoryRepo.save(order);
+        }
+
+        cartRepo.deleteAll(cartItems);
+
+        return "redirect:/order-history";
     }
 }

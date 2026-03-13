@@ -1,18 +1,24 @@
-package com.example.marketplace3.controller;
+package com.example.marketplace3;
 
+import com.example.marketplace3.model.OrderHistory;
 import com.example.marketplace3.model.Product;
+import com.example.marketplace3.repository.OrderHistoryRepository;
 import com.example.marketplace3.repository.ProductRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 public class AdminController {
 
     private final ProductRepository productRepository;
+    private final OrderHistoryRepository orderRepo;
 
-    public AdminController(ProductRepository productRepository) {
+    public AdminController(ProductRepository productRepository, OrderHistoryRepository orderRepo) {
         this.productRepository = productRepository;
+        this.orderRepo = orderRepo;
     }
 
     @GetMapping("/admin")
@@ -64,5 +70,20 @@ public class AdminController {
         productRepository.save(product);
 
         return "redirect:/admin";
+    }
+    @GetMapping("/orders")
+    public String adminOrders(Model model) {
+        List<OrderHistory> orders = orderRepo.findAll();
+        model.addAttribute("orders", orders);
+        return "orders"; // create a Thymeleaf template for this
+    }
+
+    // Update status
+    @PostMapping("/admin/orders/update-status/{id}")
+    public String updateOrderStatus(@PathVariable Long id, @RequestParam String status) {
+        OrderHistory order = orderRepo.findById(id).orElseThrow();
+        order.setStatus(status);
+        orderRepo.save(order);
+        return "redirect:/orders";
     }
 }

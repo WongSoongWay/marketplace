@@ -102,73 +102,75 @@
 <div class="cart-container">
 
     <!-- Cart items -->
-    <div class="cart-item-card" th:each="item : ${cartItems}">
-        <p class="cart-item-name" th:text="${item.product.name}"></p>
-        <img th:src="${item.product.imageUrl}" alt="Product Image">
+    <div class="cart-item-card" th:if="${item.isVisible()}" th:each="item : ${cartItems}">
+            <p class="cart-item-name" th:text="${item.product.name}"></p>
+            <img th:src="${item.product.imageUrl}" alt="Product Image">
 
-        <div class="cart-item-bottom">
-            <p>Price: $<span th:text="${item.product.price}"></span></p>
+            <div class="cart-item-bottom">
+                <p>Price: $<span th:text="${item.product.price}"></span></p>
 
-            <form th:action="@{/cart/update/{id}(id=${item.id})}" method="post" class="cart-form">
-                <div class="quantity-selector">
-                    <button type="button" class="decrease">-</button>
-                    <input type="number" name="quantity" th:value="${item.quantity}" min="1"/>
-                    <button type="button" class="increase">+</button>
-                </div>
+                <form th:action="@{/cart/update/{id}(id=${item.id})}" method="post" class="cart-form">
+                    <div class="quantity-selector">
+                        <button type="button" class="decrease">-</button>
+                        <input type="number" name="quantity" th:value="${item.quantity}" min="1"/>
+                        <button type="button" class="increase">+</button>
+                    </div>
 
-                <button class="remove-btn" type="submit" name="action" value="remove">Remove</button>
-            </form>
+                    <button class="remove-btn" type="submit" name="action" value="remove">Remove</button>
+                </form>
 
-            <p>Subtotal: $<span th:text="${#numbers.formatDecimal(item.product.price * item.quantity,1,2)}"></span></p>
+                <p>Subtotal: $<span th:text="${#numbers.formatDecimal(item.product.price * item.quantity,1,2)}"></span></p>
+            </div>
         </div>
-    </div>
 
-    <script>
-        document.querySelectorAll(".cart-form").forEach(form => {
-            const input = form.querySelector("input[name='quantity']");
-            const decrease = form.querySelector(".decrease");
-            const increase = form.querySelector(".increase");
+        <script>
+            document.querySelectorAll(".cart-form").forEach(form => {
+                const input = form.querySelector("input[name='quantity']");
+                const decrease = form.querySelector(".decrease");
+                const increase = form.querySelector(".increase");
 
-            // Plus/minus buttons
-            decrease.addEventListener("click", () => {
-                let actionInput = document.createElement("input");
-                actionInput.type = "hidden";
-                actionInput.name = "action";
-                actionInput.value = "decrease";
-                form.appendChild(actionInput);
-                form.submit();
-            });
-
-            increase.addEventListener("click", () => {
-                let actionInput = document.createElement("input");
-                actionInput.type = "hidden";
-                actionInput.name = "action";
-                actionInput.value = "increase";
-                form.appendChild(actionInput);
-                form.submit();
-            });
-
-            // Enter key to update quantity
-            input.addEventListener("keydown", (e) => {
-                if(e.key === "Enter") {
-                    e.preventDefault();
+                // Plus/minus buttons
+                decrease.addEventListener("click", () => {
                     let actionInput = document.createElement("input");
                     actionInput.type = "hidden";
                     actionInput.name = "action";
-                    actionInput.value = "update";
+                    actionInput.value = "decrease";
                     form.appendChild(actionInput);
                     form.submit();
-                }
+                });
+
+                increase.addEventListener("click", () => {
+                    let actionInput = document.createElement("input");
+                    actionInput.type = "hidden";
+                    actionInput.name = "action";
+                    actionInput.value = "increase";
+                    form.appendChild(actionInput);
+                    form.submit();
+                });
+
+                // Enter key to update quantity
+                input.addEventListener("keydown", (e) => {
+                    if(e.key === "Enter") {
+                        e.preventDefault();
+                        let actionInput = document.createElement("input");
+                        actionInput.type = "hidden";
+                        actionInput.name = "action";
+                        actionInput.value = "update";
+                        form.appendChild(actionInput);
+                        form.submit();
+                    }
+                });
             });
-        });
-    </script>
+        </script>
 
     <!-- Cart summary -->
     <div class="cart-summary">
         <h2>Cart Summary</h2>
-        <p>Total Items: <span th:text="${#lists.size(cartItems)}"></span></p>
+        <p>Total Items: <span th:text="${totalQuantity}"></span></p>
         <p>Total Price: $<span th:text="${total}"></span></p>
-        <button class="checkout-btn" th:if="${#lists.size(cartItems) > 0}">Checkout</button>
+        <form th:action="@{/cart/checkout}" method="post">
+            <button class="checkout-btn" type="submit">Checkout</button>
+        </form>
         <p th:if="${#lists.size(cartItems) == 0}">Your cart is empty</p>
     </div>
 

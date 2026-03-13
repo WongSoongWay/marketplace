@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Your Order History</title>
+    <style>
+        body { font-family: sans-serif; }
+        .order-box { border:1px solid #ccc; padding:20px; margin-bottom:20px; border-radius:10px; }
+        .order-box h3 { margin-top:0; }
+        .order-item { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #eee; }
+        .order-item:last-child { border-bottom:none; }
+        .product-name { font-weight:bold; }
+    </style>
+</head>
+<body>
+<a href="/">Home</a>
+<h1>Your Order History</h1>
+
+<div th:if="${groupedOrders.isEmpty()}">
+    <p>You have no orders yet.</p>
+</div>
+
+<div th:each="orderEntry : ${groupedOrders}">
+    <div class="order-box">
+        <h3>Order #<span th:text="${orderEntry.key}"></span></h3>
+
+        <div th:each="item : ${orderEntry.value}">
+            <div class="order-item">
+                <span class="product-name" th:text="${item.product.name}"></span>
+                <span>Quantity: <span th:text="${item.quantity}"></span></span>
+                <span>Price: $<span th:text="${item.price}"></span></span>
+                <span>Subtotal: $<span th:text="${item.price * item.quantity}"></span></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
