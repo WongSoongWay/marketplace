@@ -30,19 +30,34 @@ public class OrderHistoryController {
         User user = (User) session.getAttribute("user");
         if (user == null) return "redirect:/login";
 
+        // get all orders for the user
         List<OrderHistory> orders = orderRepo.findByUserIdOrderByOrderIdDesc(user.getId());
 
-        // Build view objects
+        // map to OrderHistoryView so we have the product object
         List<OrderHistoryView> views = orders.stream().map(o -> {
-            Product p = productRepo.findById(o.getProductId()).orElseThrow();
-            return new OrderHistoryView(o.getOrderId(), p, o.getQuantity(), o.getPrice(), o.getStatus());
+            Product product = productRepo.findById(o.getProductId()).orElseThrow();
+            return new OrderHistoryView(
+                    o.getOrderId(),
+                    product,           // keep the product object
+                    o.getQuantity(),
+                    o.getPrice(),      // price at checkout
+                    o.getStatus()
+            );
         }).toList();
 
-        // Group by orderId
-        Map<Long, List<OrderHistoryView>> grouped = views.stream()
+        // group by orderId
+        Map<Long, List<OrderHistoryView>> groupedOrders = views.stream()
                 .collect(Collectors.groupingBy(OrderHistoryView::getOrderId, LinkedHashMap::new, Collectors.toList()));
 
-        model.addAttribute("groupedOrders", grouped);
+        // compute total price per order
+        Map<Long, Double> orderTotals = new LinkedHashMap<>();
+        groupedOrders.forEach((orderId, items) -> {
+            double total = items.stream().mapToDouble(i -> i.getPrice() * i.getQuantity()).sum();
+            orderTotals.put(orderId, total);
+        });
+
+        model.addAttribute("groupedOrders", groupedOrders);
+        model.addAttribute("orderTotals", orderTotals);
 
         return "order-history";
     }

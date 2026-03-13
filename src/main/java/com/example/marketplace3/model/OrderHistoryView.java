@@ -1,6 +1,9 @@
 package com.example.marketplace3.model;
 
+import com.example.marketplace3.model.Product;
+
 public class OrderHistoryView {
+
     private Long orderId;
     private Product product;
     private int quantity;

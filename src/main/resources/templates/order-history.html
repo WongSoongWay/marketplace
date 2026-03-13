@@ -21,16 +21,20 @@
 
 <div th:each="orderEntry : ${groupedOrders}">
     <div class="order-box">
-        <h3>Order #<span th:text="${orderEntry.key}"></span></h3>
+        <h3>
+            Order #<span th:text="${orderEntry.key}"></span>
+            - Status: <span th:text="${orderEntry.value[0].status}"></span>
+        </h3>
 
         <div th:each="item : ${orderEntry.value}">
             <div class="order-item">
                 <span class="product-name" th:text="${item.product.name}"></span>
                 <span>Quantity: <span th:text="${item.quantity}"></span></span>
-                <span>Price: $<span th:text="${item.price}"></span></span>
                 <span>Subtotal: $<span th:text="${item.price * item.quantity}"></span></span>
             </div>
         </div>
+
+        <p><strong>Total: $<span th:text="${orderTotals[orderEntry.key]}"></span></strong></p>
     </div>
 </div>
 

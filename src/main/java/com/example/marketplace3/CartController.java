@@ -101,36 +101,30 @@ public class CartController {
     }
     @PostMapping("/checkout")
     public String checkout(HttpSession session) {
-
         User user = (User) session.getAttribute("user");
-
-        if(user == null) {
-            return "redirect:/login";
-        }
+        if (user == null) return "redirect:/login";
 
         List<CartItem> cartItems = cartRepo.findByUserId(user.getId());
+        if (cartItems.isEmpty()) return "redirect:/cart";
 
-        if(cartItems.isEmpty()) {
-            return "redirect:/cart";
-        }
-
+        // Generate a new orderId (for grouping items of the same order)
         Long orderId = System.currentTimeMillis();
 
         for (CartItem item : cartItems) {
+            Product product = productRepo.findById(item.getProductId()).orElseThrow();
 
-            Product product = productRepo.findById(item.getProductId()).orElse(null);
-            if(product == null) continue;
             OrderHistory order = new OrderHistory(
                     orderId,
                     user.getId(),
-                    item.getProductId(),
+                    product.getId(),
                     item.getQuantity(),
-                    product.getPrice()
+                    product.getPrice() // save price at checkout
             );
 
             orderHistoryRepo.save(order);
         }
 
+        // Clear cart
         cartRepo.deleteAll(cartItems);
 
         return "redirect:/order-history";
