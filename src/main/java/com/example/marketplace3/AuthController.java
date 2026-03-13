@@ -2,6 +2,7 @@ package com.example.marketplace3;
 
 import com.example.marketplace3.model.User;
 import com.example.marketplace3.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -57,5 +58,13 @@ public class AuthController {
         }
 
         return "redirect:/login?error";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        // Invalidate the session
+        session.invalidate();
+        // Redirect to login page
+        return "redirect:/login";
     }
 }
