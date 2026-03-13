@@ -1,10 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Cart</title>
 </head>
+
 <body>
+
+<h1>Your Cart</h1>
+
+<div th:each="item : ${cartItems}">
+
+    <p>Product ID: <span th:text="${item.productId}"></span></p>
+
+    <p>Quantity: <span th:text="${item.quantity}"></span></p>
+
+    <form th:action="@{/cart/increase/{id}(id=${item.id})}" method="post">
+        <button type="submit">+</button>
+    </form>
+
+    <form th:action="@{/cart/decrease/{id}(id=${item.id})}" method="post">
+        <button type="submit">-</button>
+    </form>
+
+    <form th:action="@{/cart/remove/{id}(id=${item.id})}" method="post">
+        <button type="submit">Remove</button>
+    </form>
+
+</div>
 
 </body>
 </html>
