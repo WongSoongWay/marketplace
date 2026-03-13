@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface OrderHistoryRepository extends JpaRepository<OrderHistory, Long> {
     List<OrderHistory> findByUserIdOrderByOrderIdDesc(Long userId);
+    List<OrderHistory> findByOrderId(Long orderId); // ← needed for admin status update
 }

@@ -1,31 +1,29 @@
-<a href="/admin">Admin</a>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Orders</title>
+</head>
+<body>
+<a href="/">Home</a>
 <h1>Orders</h1>
-<table>
+<table border="1" cellpadding="5" cellspacing="0">
     <thead>
     <tr>
         <th>Order ID</th>
-        <th>Product</th>
-        <th>User ID</th>
-        <th>Quantity</th>
-        <th>Price</th>
         <th>Status</th>
         <th>Update Status</th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each="order : ${orders}">
-        <td th:text="${order.orderId}"></td>
-        <td th:text="${order.productId}"></td>
-        <td th:text="${order.userId}"></td>
-        <td th:text="${order.quantity}"></td>
-        <td th:text="${order.price}"></td>
-        <td th:text="${order.status}"></td>
+    <tr th:each="entry : ${orders}">
+        <td th:text="${entry.key}"></td>
+        <td th:text="${entry.value}"></td>
         <td>
-            <form th:action="@{/admin/orders/update-status/{id}(id=${order.id})}" method="post">
+            <form th:action="@{/orders/update-status/{orderId}(orderId=${entry.key})}" method="post">
                 <select name="status">
-                    <option value="Confirmed" th:selected="${order.status == 'Confirmed'}">Confirmed</option>
-                    <option value="Shipped" th:selected="${order.status == 'Shipped'}">Shipped</option>
-                    <option value="Completed" th:selected="${order.status == 'Completed'}">Completed</option>
+                    <option value="Confirmed" th:selected="${entry.value == 'Confirmed'}">Confirmed</option>
+                    <option value="Shipped" th:selected="${entry.value == 'Shipped'}">Shipped</option>
+                    <option value="Completed" th:selected="${entry.value == 'Completed'}">Completed</option>
                 </select>
                 <button type="submit">Update</button>
             </form>
@@ -33,3 +31,5 @@
     </tr>
     </tbody>
 </table>
+</body>
+</html>

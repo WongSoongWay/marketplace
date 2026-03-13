@@ -8,7 +8,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class AdminController {
@@ -73,17 +76,30 @@ public class AdminController {
     }
     @GetMapping("/orders")
     public String adminOrders(Model model) {
+        // Get all distinct order IDs with their current status (assume all items in an order share same status)
         List<OrderHistory> orders = orderRepo.findAll();
-        model.addAttribute("orders", orders);
-        return "orders"; // create a Thymeleaf template for this
+
+        // Map orderId -> status (pick status of first item in order)
+        Map<Long, String> orderStatusMap = new LinkedHashMap<>();
+        orders.stream()
+                .collect(Collectors.groupingBy(OrderHistory::getOrderId))
+                .forEach((orderId, items) -> orderStatusMap.put(orderId, items.get(0).getStatus()));
+
+        model.addAttribute("orders", orderStatusMap);
+
+        return "orders"; // new Thymeleaf template
     }
 
-    // Update status
-    @PostMapping("/admin/orders/update-status/{id}")
-    public String updateOrderStatus(@PathVariable Long id, @RequestParam String status) {
-        OrderHistory order = orderRepo.findById(id).orElseThrow();
-        order.setStatus(status);
-        orderRepo.save(order);
+    @PostMapping("/orders/update-status/{orderId}")
+    public String updateOrderStatus(@PathVariable Long orderId,
+                                    @RequestParam String status) {
+        // Update status for all items in this order
+        List<OrderHistory> orderItems = orderRepo.findByOrderId(orderId);
+        for (OrderHistory item : orderItems) {
+            item.setStatus(status);
+            orderRepo.save(item);
+        }
+
         return "redirect:/orders";
     }
 }
