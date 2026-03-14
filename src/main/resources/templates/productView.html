@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${product.name}">Product</title>
+
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            background:#f7f7f7;
+            margin:0;
+            padding:40px;
+        }
+
+        .product-container{
+            max-width:1000px;
+            margin:auto;
+            background:white;
+            border-radius:12px;
+            box-shadow:0 5px 20px rgba(0,0,0,0.1);
+            display:flex;
+            gap:40px;
+            padding:40px;
+        }
+
+        .product-image img{
+            width:350px;
+            border-radius:10px;
+        }
+
+        .product-info{
+            display:flex;
+            flex-direction:column;
+            gap:20px;
+        }
+
+        .product-name{
+            font-size:32px;
+            font-weight:bold;
+        }
+
+        .product-price{
+            font-size:26px;
+            color:#2ecc71;
+            font-weight:bold;
+        }
+
+        .product-description{
+            font-size:16px;
+            color:#555;
+            line-height:1.5;
+        }
+
+        .add-cart{
+            margin-top:20px;
+        }
+
+        .add-cart button{
+            padding:12px 20px;
+            font-size:16px;
+            border:none;
+            border-radius:8px;
+            background:#3498db;
+            color:white;
+            cursor:pointer;
+        }
+
+        .add-cart button:hover{
+            background:#2980b9;
+        }
+
+        .back{
+            margin-bottom:20px;
+            display:inline-block;
+        }
+    </style>
+</head>
+
+<body>
+
+<a href="/" class="back">⬅ Back to Products</a>
+
+<div class="product-container">
+
+    <div class="product-image">
+        <img th:src="${product.imageUrl}" alt="Product Image">
+    </div>
+
+    <div class="product-info">
+
+        <div class="product-name" th:text="${product.name}"></div>
+
+        <div class="product-price">
+            $<span th:text="${product.price}"></span>
+        </div>
+
+        <div class="product-description" th:text="${product.description}"></div>
+
+        <form class="add-cart"
+              th:action="@{/cart/add/{productId}(productId=${product.id})}"
+              method="post">
+
+            <label>Quantity:</label>
+            <input type="number" name="quantity" value="1" min="1">
+
+            <button type="submit" class="add-cart" th:if="${session.user != null}">Add to Cart</button>
+            <p th:if="${session.user == null}">Login to add to cart</p>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>
